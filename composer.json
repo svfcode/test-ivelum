@@ -12,7 +12,9 @@
         }
     ],
     "require": {
-        "guzzlehttp/guzzle": "^7.0"
+        "guzzlehttp/guzzle": "^7.0",
+        "ext-mbstring": "*",
+        "ext-dom": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "^9"

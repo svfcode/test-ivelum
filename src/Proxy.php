@@ -17,16 +17,22 @@ class Proxy {
         try {
             $response = $client->get($_SERVER['REQUEST_URI']);
 
-            $handledBody = $this->add_tm($response->getBody()->getContents());
+            $result = $response->getBody()->getContents();
 
-            echo $handledBody;
+            if ($this->is_html($response->getHeaders())) {
+                $result = $this->add_tm($result);
+            }
+
+            echo $result;
 
         } catch (ClientException $e) {
             header('HTTP/1.1 404 Not Found');
             echo $e->getResponse()->getBody()->getContents();
         }
+    }
 
-
+    private function is_html($headers) {
+        return array_key_exists('Content-Type', $headers) && str_contains($headers['Content-Type'][0], 'text/html');
     }
 
     public function add_tm($page) {
@@ -37,7 +43,7 @@ class Proxy {
         $tags = $xpath->query('//*//text()');
 
         foreach ($tags as $tag) {
-            $tag->nodeValue = preg_replace_callback('/\b(\w{6})\b(\.\w|\/|:)?/u', function ($m) {
+            $tag->nodeValue = preg_replace_callback('/\b(\w{6})\b(\.\w|\/|™)?/u', function ($m) {
                 if (array_key_exists(2, $m)) {
                     return $m[1] . $m[2];
                 }
